@@ -1,7 +1,6 @@
-File1 = 'weather_data_from_ssh.txt'  # 要进行处理的数据
-File2 = 'data_for_test.txt'  # 用来测试的数据
-File3 = 'weather_data_from_ssh2.txt'
-with open(File3) as f_object:
+File1 = 'error1_data.txt'  # 要进行处理的数据
+
+with open(File1,encoding='utf-8') as f_object:
     pre_data = f_object.readlines()
     data = []
     for i in range(len(pre_data)):
@@ -14,18 +13,18 @@ with open(File3) as f_object:
 i = 0
 j = 0
 box = ''
-error_list = []
+error_list = set()
 while i < len(data):
     if i == 0:
         if float(data[i][3]) > 10000 or abs(float(data[i][4])) > 100:
-           error_list.append([data[i][0], data[i][1]])
+           error_list.add((data[i][0], data[i][1]))
         j = 1
         i += 1
         box = data[i][1]
 
     else:
         if float(data[i][3]) > 10000 or abs(float(data[i][4])) > 100:
-            error_list.append([data[i][0], data[i][1]])     # 不完善，会出现1月份异常数据，导致在异常年份的表中输出2次
+            error_list.add((data[i][0], data[i][1]))     # 不完善，会出现1月份异常数据，导致在异常年份的表中输出2次
         if box == data[i][1]:
             i += 1
             j += 1
@@ -36,9 +35,11 @@ while i < len(data):
             j = 0
             box = data[i][1]
             print("缺少月份 {} {}".format(data[i-1][0],data[i-1][1]))
-            error_list.append((data[i-1][0], data[i-1][1]))
+            error_list.add((data[i-1][0], data[i-1][1]))
 if j != 12:
-    error_list.append((data[i-1][0],data[i-1][1]))
+    error_list.add((data[i-1][0],data[i-1][1]))
+
+error_list = list(error_list)
 with open('error_site_year_for2.txt', 'w') as f_object3:
     for i in range(len(error_list)):
         f_object3.write("{} {}\n".format(error_list[i][0], error_list[i][1]))
